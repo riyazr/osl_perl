@@ -6,8 +6,8 @@ use Net::SMTP;
 use LWP::UserAgent;
  
 
-my $error_log  = 'Responser_errors.txt';# File to store errors of program
-my $input_file = 'urls.txt';       # From where program will read WEB Addresses
+my $error_log  = 'Responser_errors.txt';
+my $input_file = 'urls.txt';       
 my $response_limit = 12; #In Seconds    
 
 die "File $input_file is not exist\n" unless (-e $input_file);
@@ -35,7 +35,7 @@ for (0 .. $#all_addr) {
  chop $all_addr[$_] if ($all_addr[$_] =~ /\s+$/);
  next if ($all_addr[$_]  eq "");
  
-   check_url($all_addr[$_]);    #call subroutine check_url()
+   check_url($all_addr[$_]);    
 }
 
 my $err = join "\015\012",@errors;
@@ -49,16 +49,16 @@ sub check_url {  # subroutine who check given URL
         my $ua = LWP::UserAgent->new;
         $ua->agent("$0/0.1 " . $ua->agent);
         my $req = HTTP::Request->new(GET => "$target");
-        $req->header('Accept' => 'text/html');          #Accept HTML Page
+        $req->header('Accept' => 'text/html');          
         # send request
-        my $start = time;      # Start timer
+        my $start = time;      
         my $res = $ua->request($req);
         # check the outcome
         if ($res->is_success) {
-        # Success....all content of page has been received
-          my $time = time;     # End timer
+        
+          my $time = time;     
           my $out_format;
-          $time = ($time - $start); # Result of timer
+          $time = ($time - $start); 
           if ($response_limit && ($response_limit <= $time)) {
              push(@errors, "Slow response from $target\: $time seconds");
              $out_format = sprintf "| %-50.50s %-10s %-20s |\n", 
@@ -67,18 +67,18 @@ sub check_url {  # subroutine who check given URL
              $out_format = sprintf "| %-50.50s %-10s %-20s |\n", 
                   $target, "ACCESSED", "Response $time seconds";
           }
-          print OUT $out_format; # write to file
-          print $out_format;     # print to console
+          print OUT $out_format; 
+          print $out_format;     
         } else { 
           my $out_format = sprintf "| %-50.50s %-10s %-20s |\n", 
                                           $target, "DOWN", " N/A";
           push(@errors, "$target is DOWN." . $res->status_line) 
                            or error("Cannot push error for DOWN");
-          print OUT $out_format; # write to file
-          print $out_format;     # print to console
+          print OUT $out_format; 
+          print $out_format;     
     }
 }
-sub error {      # subroutine who print in Error Log
+sub error {      
   my $error_msg = shift;
   open ERR,">> $error_log" 
        or die "Cannot open log file $error_log : $!\n";
